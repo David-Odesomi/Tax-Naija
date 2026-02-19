@@ -1,0 +1,122 @@
+.container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 24px;
+  font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+h2 {
+  color: #0066cc;
+  margin-bottom: 16px;
+}
+
+.monthly-input {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.monthly-input label {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.monthly-input input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.monthly-input input:focus {
+  outline: none;
+  border-color: #0066cc;
+}
+
+.monthly-input button,
+#calculateBtn {
+  width: 100%;
+  padding: 12px 24px;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.monthly-input button:hover,
+#calculateBtn:hover {
+  background: #0052a3;
+}
+
+.entered-months {
+  margin-bottom: 24px;
+}
+
+.entered-months h3 {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.entered-months ul {
+  list-style: none;
+  padding: 0;
+}
+
+.entered-months li {
+  padding: 8px 12px;
+  background: #f5f5f5;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.results {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.results h3 {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.results p {
+  margin: 12px 0;
+  color: #555;
+}
+
+#annualIncome {
+  font-weight: 600;
+  color: #222;
+  font-size: 18px;
+}
+
+#taxBracket {
+  font-weight: 500;
+  color: #0066cc;
+}
+
+#taxAmount {
+  font-weight: 600;
+  color: #d32f2f;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 18px;
+}
