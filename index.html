@@ -1,36 +1,490 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tax Naija</title>
+    <title>Tax Naija - Nigerian Income Tax Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="container">
-      <h1>Tax Naija</h1>
-
-      <section class="monthly-input">
-        <h2 id="monthHeading">January</h2>
-        <label for="income"
-          >Enter income for <span id="currentMonth">January</span></label
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <span class="logo-icon">🇳🇬</span>
+          <h1>Tax Naija</h1>
+        </div>
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          aria-label="Toggle dark mode"
         >
-        <input type="number" id="income" placeholder="Enter monthly income" />
-        <button id="nextBtn">Next</button>
+          <svg
+            class="sun-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg
+            class="moon-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="calculator-section">
+        <div class="calculator-card">
+          <h2>Income Details</h2>
+
+          <div class="toggle-group">
+            <label class="toggle-label">Income Period</label>
+            <div class="toggle-switch" id="periodToggle">
+              <button class="toggle-btn active" data-value="monthly">
+                Monthly
+              </button>
+              <button class="toggle-btn" data-value="annual">Annual</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="income">Gross Income</label>
+            <div class="currency-input">
+              <span class="currency-symbol">₦</span>
+              <input
+                type="text"
+                id="income"
+                placeholder="0"
+                inputmode="numeric"
+              />
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="pension">Pension Rate (%)</label>
+              <input
+                type="number"
+                id="pension"
+                value="8"
+                min="0"
+                max="20"
+                step="0.5"
+              />
+            </div>
+            <div class="input-group">
+              <label for="rent">Annual Rent (₦)</label>
+              <input
+                type="text"
+                id="rent"
+                placeholder="0"
+                inputmode="numeric"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="bonus-card" id="bonusCard">
+          <h2>Bonus / 13th Month</h2>
+          <div class="input-group">
+            <label for="bonus">Bonus Amount (₦)</label>
+            <div class="currency-input">
+              <span class="currency-symbol">₦</span>
+              <input
+                type="text"
+                id="bonus"
+                placeholder="0"
+                inputmode="numeric"
+              />
+            </div>
+          </div>
+          <div class="bonus-result" id="bonusResult" style="display: none">
+            <div class="bonus-row">
+              <span>Gross Bonus</span>
+              <span id="grossBonus">₦0</span>
+            </div>
+            <div class="bonus-row">
+              <span>Bonus Tax (10%)</span>
+              <span id="bonusTax">₦0</span>
+            </div>
+            <div class="bonus-row total">
+              <span>Net Bonus</span>
+              <span id="netBonus">₦0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none">
+          <div class="results-header">
+            <h2>Tax Summary</h2>
+            <div class="action-buttons">
+              <button class="action-btn" id="copyBtn" title="Copy to clipboard">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                  ></path>
+                </svg>
+                Copy
+              </button>
+              <button class="action-btn" id="pdfBtn" title="Download PDF">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                PDF
+              </button>
+              <button class="action-btn reset-btn" id="resetBtn" title="Reset">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                  ></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <div class="results-grid" id="resultsGrid">
+            <div class="result-card income">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path
+                    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                  ></path>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Gross Income</span>
+                <span class="result-value" id="grossIncome">₦0</span>
+              </div>
+            </div>
+            <div class="result-card deduction">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Total Deductions</span>
+                <span class="result-value" id="totalDeductions">₦0</span>
+              </div>
+            </div>
+            <div class="result-card taxable">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Taxable Income</span>
+                <span class="result-value" id="taxableIncome">₦0</span>
+              </div>
+            </div>
+            <div class="result-card tax">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Annual Tax</span>
+                <span class="result-value" id="annualTax">₦0</span>
+              </div>
+            </div>
+            <div class="result-card monthly-tax">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Monthly Tax</span>
+                <span class="result-value" id="monthlyTax">₦0</span>
+              </div>
+            </div>
+            <div class="result-card rate">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Effective Tax Rate</span>
+                <span class="result-value" id="effectiveRate">0%</span>
+              </div>
+            </div>
+            <div class="result-card net">
+              <div class="result-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  ></path>
+                </svg>
+              </div>
+              <div class="result-content">
+                <span class="result-label">Net Take-home Pay</span>
+                <span class="result-value" id="netIncome">₦0</span>
+                <span class="result-sub" id="monthlyNet">₦0/month</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <h3>Income Breakdown</h3>
+            <div class="chart-wrapper">
+              <canvas id="breakdownChart"></canvas>
+            </div>
+          </div>
+
+          <div class="breakdown-table-container">
+            <h3>Tax Bracket Breakdown</h3>
+            <div class="table-wrapper">
+              <table class="breakdown-table">
+                <thead>
+                  <tr>
+                    <th>Bracket</th>
+                    <th>Rate</th>
+                    <th>Amount in Bracket</th>
+                    <th>Tax Owed</th>
+                  </tr>
+                </thead>
+                <tbody id="breakdownBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section class="entered-months" id="enteredMonths">
-        <h3>Entered Monthly Income:</h3>
-        <ul id="monthList"></ul>
-      </section>
-
-      <section class="results" id="results" style="display: none">
-        <h3>Annual Tax Summary</h3>
-        <p id="annualIncome">Annual Income:</p>
-        <p id="taxBracket">Your Selected Tax Bracket:</p>
-        <p id="taxAmount">Tax Amount:</p>
+      <section
+        class="comparison-section"
+        id="comparisonSection"
+        style="display: none"
+      >
+        <div class="comparison-card">
+          <h2>Salary Comparison</h2>
+          <div class="comparison-grid">
+            <div class="comparison-inputs">
+              <div class="comparison-column">
+                <h3>Salary A</h3>
+                <div class="input-group">
+                  <label>Income</label>
+                  <div class="currency-input">
+                    <span class="currency-symbol">₦</span>
+                    <input type="text" id="compareIncome1" placeholder="0" />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Pension (%)</label>
+                  <input
+                    type="number"
+                    id="comparePension1"
+                    value="8"
+                    min="0"
+                    max="20"
+                  />
+                </div>
+                <div class="comparison-result" id="result1">
+                  <div class="comp-row">
+                    <span>Tax</span>
+                    <span id="compTax1">₦0</span>
+                  </div>
+                  <div class="comp-row">
+                    <span>Take-home</span>
+                    <span id="compNet1">₦0</span>
+                  </div>
+                  <div class="comp-row">
+                    <span>Effective Rate</span>
+                    <span id="compRate1">0%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-column">
+                <h3>Salary B</h3>
+                <div class="input-group">
+                  <label>Income</label>
+                  <div class="currency-input">
+                    <span class="currency-symbol">₦</span>
+                    <input type="text" id="compareIncome2" placeholder="0" />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Pension (%)</label>
+                  <input
+                    type="number"
+                    id="comparePension2"
+                    value="8"
+                    min="0"
+                    max="20"
+                  />
+                </div>
+                <div class="comparison-result" id="result2">
+                  <div class="comp-row">
+                    <span>Tax</span>
+                    <span id="compTax2">₦0</span>
+                  </div>
+                  <div class="comp-row">
+                    <span>Take-home</span>
+                    <span id="compNet2">₦0</span>
+                  </div>
+                  <div class="comp-row">
+                    <span>Effective Rate</span>
+                    <span id="compRate2">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="comparison-diff" id="comparisonDiff">
+              <h3>Difference</h3>
+              <div class="diff-row">
+                <span>Tax Difference</span>
+                <span id="diffTax">₦0</span>
+              </div>
+              <div class="diff-row">
+                <span>Take-home Difference</span>
+                <span id="diffNet">₦0</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
+
+    <footer class="footer">
+      <p>Tax Naija &copy; 2026 — Nigerian Income Tax Calculator</p>
+    </footer>
 
     <script src="logic.js"></script>
   </body>
